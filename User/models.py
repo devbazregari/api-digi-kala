@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import PermissionsMixin , AbstractBaseUser , BaseUserManager
 
+
 class UserManager(BaseUserManager):
 
     def create_superuser(self, email , mobile , password , **other_fields):
@@ -35,13 +36,12 @@ class UserManager(BaseUserManager):
 
         return user
 
-
 class NewUser(AbstractBaseUser , PermissionsMixin):
     name   = models.CharField(max_length=60 , null=True , blank=True)
     family = models.CharField(max_length=100 , null=True , blank=True)
     email  = models.EmailField(unique=True , null=False , blank=True)
     mobile = models.BigIntegerField(unique=True , null=False , blank=True)
-    #cart  = 
+
     
     # Admin
     is_staff = models.BooleanField(default=False)
