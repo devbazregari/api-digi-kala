@@ -10,6 +10,8 @@ from knox.auth import AuthToken
 @api_view(['POST',])
 def register(request):
 
+    print('hhhhhiiiii')
+
     if request.method == 'POST':
 
         serializer = RegisterUserSerializers(data=request.data)
