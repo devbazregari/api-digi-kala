@@ -39,7 +39,7 @@ class UserManager(BaseUserManager):
 class NewUser(AbstractBaseUser , PermissionsMixin):
     name   = models.CharField(max_length=60 , null=True , blank=True)
     family = models.CharField(max_length=100 , null=True , blank=True)
-    email  = models.EmailField(unique=True , null=False , blank=True)
+    email  = models.EmailField(unique=True , null=True , blank=True)
     mobile = models.BigIntegerField(unique=True , null=False , blank=True)
 
     
@@ -48,8 +48,8 @@ class NewUser(AbstractBaseUser , PermissionsMixin):
     is_active = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['mobile']    
+    USERNAME_FIELD = 'mobile'
+    
 
     objects = UserManager()
     

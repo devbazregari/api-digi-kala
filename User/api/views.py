@@ -10,7 +10,6 @@ from knox.auth import AuthToken
 @api_view(['POST',])
 def register(request):
 
-    print('hhhhhiiiii')
 
     if request.method == 'POST':
 
@@ -25,7 +24,6 @@ def register(request):
         return Response({
 
             'mobile':user.mobile,
-            'email':user.email,
             'toke':token,
 
 
