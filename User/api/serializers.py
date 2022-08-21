@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from User.models import NewUser
 from rest_framework.validators import UniqueValidator
+from .utils import hash
 
 class RegisterUserSerializers(serializers.ModelSerializer):
     
@@ -21,11 +22,12 @@ class RegisterUserSerializers(serializers.ModelSerializer):
 
     def create(self, validated_data):
         
+        hash_pass = hash(validated_data['password'])
         user = NewUser(
             mobile = validated_data['mobile'],
         )
 
-        user.set_password(validated_data['password'])
+        user.password = hash_pass
         user.save()
         return user
 
