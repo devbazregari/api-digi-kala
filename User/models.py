@@ -1,57 +1,40 @@
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
-from django.contrib.auth.models import PermissionsMixin , AbstractBaseUser , BaseUserManager
 
 
-class UserManager(BaseUserManager):
+class CustomUserManager(BaseUserManager):
+    def create_user(self,  password, **kwargs):
+  
 
-    def create_superuser(self, email , mobile , password , **other_fields):
+        user = self.model(**kwargs)
 
-        other_fields.setdefault('is_staff',True)
-        other_fields.setdefault('is_active',True)
-        other_fields.setdefault('is_superuser',True)
-
-        if not email:
-            raise ValueError("the user must have an specefic email ")
-        
-        if other_fields.get('is_staff') is not True:
-            raise ValueError(" the superuser's is_staff must be true ")
-        
-
-        if other_fields.get('is_active') is not True:
-            raise ValueError(" the superuser's is_active must be true ")
-
-
-        return self.create_user(email = email , mobile = mobile , password = password , **other_fields)
-
-
-    def create_user(self , email , mobile , password , **other_fields ):
-        
-        if not email:
-            raise ValueError("the user must have an specefic email ")
-        
-        email = self.normalize_email(email)
-        user = self.model(email = email , mobile = mobile , password = password , **other_fields)
         user.set_password(password)
         user.save()
 
         return user
 
-class NewUser(AbstractBaseUser , PermissionsMixin):
-    name   = models.CharField(max_length=60 , null=True , blank=True)
-    family = models.CharField(max_length=100 , null=True , blank=True)
-    email  = models.EmailField(unique=True , null=True , blank=True)
-    mobile = models.BigIntegerField(unique=True , null=False , blank=True)
+    def create_superuser(self , password, **kwargs):
+        user = self.create_user( password, **kwargs)
 
-    
-    # Admin
+        user.is_admin = True
+        user.is_staff = True
+        user.save()
+
+        return user
+
+
+class User(AbstractBaseUser):
+
+    mobile    = models.CharField(max_length=11 , blank=False , null=False , unique=True)
+    is_active = models.BooleanField(default=True)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
     is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
+
+
+    objects = CustomUserManager()
 
     USERNAME_FIELD = 'mobile'
-    
+    REQUIRED_FIELDS = []
 
-    objects = UserManager()
     
-    def __str__(self) -> str:
-        return self.email

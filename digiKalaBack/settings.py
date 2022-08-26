@@ -28,8 +28,13 @@ CORS_ORIGIN_WHITELIST = (
 
 INSTALLED_APPS = [
     'User',
+    'Products' ,   # MY_APP
+
+
+
+
     'rest_framework',
-    'rest_framework.authtoken',
+    'rest_framework.authtoken',  # DEPENDENCIES
     'knox',
     'corsheaders',
 
@@ -55,6 +60,20 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'knox.auth.TokenAuthentication',
+
+    ],
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE':3,
+
+    
+
+   
+}
 ROOT_URLCONF = 'digiKalaBack.urls'
 
 TEMPLATES = [
@@ -129,4 +148,12 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-AUTH_USER_MODEL = 'User.NewUser'
+AUTH_USER_MODEL = 'User.User'
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}

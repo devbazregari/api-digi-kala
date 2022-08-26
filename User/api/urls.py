@@ -1,12 +1,14 @@
 from django.urls import path 
-from .views import register , login
+from .views import register 
+from rest_framework.authtoken import views
+
 
 
 
 urlpatterns = [
     
     path('register', register , name='register'),
-    path('login', login , name='login'),
+    path('login', views.obtain_auth_token ),
 
 
 ]

@@ -8,5 +8,6 @@ urlpatterns = [
 
     # API URL 
 
-    path('api/user/', include('User.api.urls'))
+    path('api/user/', include('User.api.urls')),
+    path('api/products/', include('Products.api.urls')),
 ]
