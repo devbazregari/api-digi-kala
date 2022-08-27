@@ -1,11 +1,9 @@
-from http.client import HTTPException
 from rest_framework import status
 from rest_framework.decorators import api_view
-
-
+from User.models import User
+from .utils import verify_password
 from .serializers import RegisterUserSerializers
 from rest_framework.response import Response
-from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.auth import AuthToken
 from rest_framework.authtoken.models import Token
 
@@ -40,56 +38,33 @@ def register(request):
 
 
 
+
+
 @api_view(['POST',])
 def login(request):
 
     if request.method == 'POST':
 
-        serializer = AuthTokenSerializer(data = request.data)
+        try:
+            user = User.objects.get(mobile=request.data['mobile'])
 
-        serializer.is_valid(raise_exception=True)
+        except User.DoesNotExist:
+            return Response(status.HTTP_404_NOT_FOUND)
+        
+        
+        if verify_password(str(request.data['password']),user.password) == False:
+            return Response(status.HTTP_400_BAD_REQUEST)
 
-        user = serializer.validated_data['user']
-
+    
         _,token = AuthToken.objects.create(user)
 
+        print(token)
         return Response({
 
-            'username':user.username,
-            'email':user.email,
-            'token':token
-        })
+            'mobile':user.mobile,
+            'token':str(token),
 
 
-
-
-# @api_view(['POST',])
-# def login(request):
-
-#     if request.method == 'POST':
-
-#         try:
-#             user = NewUser.objects.get(mobile=request.data['mobile'])
-
-#         except NewUser.DoesNotExist:
-#             return Response(status.HTTP_404_NOT_FOUND)
-        
-        
-#         if verify_password(request.data['password'],user.password) == False:
-#             return Response(status.HTTP_400_BAD_REQUEST)
-
-        
-  
-#         token, created = Token.objects.get_or_create(user=user)
-        
-
-
-#         return Response({
-
-#             'mobile':user.mobile,
-#             'token':token.key,
-
-
-#             })
+            })
        
      
