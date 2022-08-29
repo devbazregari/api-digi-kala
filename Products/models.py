@@ -2,11 +2,6 @@ from django.db import models
 from User.models import User
 
 
-class Category(models.Model):
-    category_id     =   models.BigAutoField(null=False , blank=False , primary_key=True)
-    
-    name            =   models.CharField( max_length=200, null=False , blank=False , unique=True)
-
 
 class Attr(models.Model):
     name            =      models.CharField(max_length=2000 , null=False , blank=False)
@@ -14,10 +9,9 @@ class Attr(models.Model):
 
 class Product(models.Model):
     product_id      =      models.BigAutoField(null=False , blank=False , primary_key=True)
-    category_id_fk  =      models.ForeignKey(to=Category  , null=False , on_delete=models.CASCADE)
     attrs           =      models.ManyToManyField(to=Attr)       
-
     cart            =      models.ManyToManyField(to=User)
+
     title           =      models.CharField(null=False , blank=False , max_length=100)
     brand           =      models.CharField(max_length=100 , null=False , blank=False)
     price           =      models.BigIntegerField(null=False , blank=False)
@@ -25,9 +19,15 @@ class Product(models.Model):
     brandCategory   =      models.CharField(null=False , blank=False , max_length=200)
     intro           =      models.CharField(null=False , blank=False , max_length=1000)
     overView        =      models.CharField(null=False , blank=False , max_length=1000)
-                                                                                # attrs           =      models.JSONField(blank=True, null=True, max_length=10000)
+    # attrs           =      models.JSONField(blank=True, null=True, max_length=10000) this could be here 
 
 
+
+class Category(models.Model):
+    category_id     =   models.BigAutoField(null=False , blank=False , primary_key=True)
+    
+    name            =   models.CharField( max_length=200, null=False , blank=False )
+    product_id_fk   =   models.ForeignKey(to=Product , on_delete=models.CASCADE)
 
 
 

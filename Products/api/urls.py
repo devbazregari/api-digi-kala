@@ -1,13 +1,13 @@
 from django.urls import path 
-from .views import create , test
+from .views import  SearchListView , CreateProductListView
 
 
 
 urlpatterns = [
     
-    path('create', create  , name='create'),
-    path('test/<int:pk>', test  , name='test'),
+    path('list', SearchListView.as_view()  , name='search'),
    
+    path('create', CreateProductListView.as_view() , name='create'),
    
 
 ]
