@@ -1,13 +1,9 @@
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from Products.models import Attr, Product, Category
+from Products.models import Attr, Product, Category, Sold
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import authentication_classes
-from User.models import User
 from .serializers import ProductSerializer
 from rest_framework import generics
-
+from django.utils import timezone
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -15,11 +11,16 @@ from django_filters.rest_framework import DjangoFilterBackend
 class CreateProductListView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
-        product = Product(**request.data[0])
-        attr = Attr(**request.data[1])
-        category = request.data[0].pop('category')
-        prod_category = Category(name=category, product_id_fk=product)
 
+        
+        attr          =     Attr(**request.data[1])
+        category      =     request.data[0].pop('category')
+        sold_product  =     Sold(count = 1)
+        product       =     Product(**request.data[0]  , product_sold_id_fk = sold_product)
+        prod_category =     Category(name=category, product_id_fk=product)
+
+        sold_product.save()
+    
         attr.save()
         product.save()
         prod_category.save()
@@ -28,20 +29,19 @@ class CreateProductListView(generics.CreateAPIView):
 
 
 class SearchListView(generics.ListAPIView):
-    queryset = Product.objects.all()
 
+    
+    print(timezone.now())
+    queryset = Product.objects.all()
+    permission_classes = (IsAuthenticated,)
+    
     serializer_class = ProductSerializer
 
     filter_backends = [SearchFilter, DjangoFilterBackend]
     search_fields = ['intro', 'title']
 
-    # def get(self, request, *args, **kwargs):
-
-    #     category = Category.objects.select_related('product_id_fk').filter(name__contains='laptop')
-
-    #     print(category)
-    #     for i in category:
-    #         print(i.name)
-    #         print(i.product_id_fk.title)
-
-    #     return Response({'hi':'there'})
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["user_id"] = self.request.user.id
+      
+        return context

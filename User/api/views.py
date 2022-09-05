@@ -5,7 +5,6 @@ from .utils import verify_password
 from .serializers import RegisterUserSerializers
 from rest_framework.response import Response
 from knox.auth import AuthToken
-from rest_framework.authtoken.models import Token
 
 
 
@@ -15,19 +14,20 @@ def register(request):
 
     if request.method == 'POST':
 
-    
+
         serializer = RegisterUserSerializers(data=request.data)
 
         serializer.is_valid(raise_exception=True)
 
         user = serializer.save()
-   
-        
+
+
 
         _,token = AuthToken.objects.create(user)
 
         return Response({
 
+            'user_id':user.pk,
             'mobile':user.mobile,
             'token':token,
 
@@ -50,21 +50,21 @@ def login(request):
 
         except User.DoesNotExist:
             return Response(status.HTTP_404_NOT_FOUND)
-        
-        
+
+
         if verify_password(str(request.data['password']),user.password) == False:
             return Response(status.HTTP_400_BAD_REQUEST)
 
-    
+
         _,token = AuthToken.objects.create(user)
 
         print(token)
         return Response({
 
+            'user_id':user.pk,
             'mobile':user.mobile,
             'token':str(token),
 
 
             })
-       
-     
+

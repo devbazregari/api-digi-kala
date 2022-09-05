@@ -4,6 +4,11 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+from datetime import timedelta
+from datetime import timedelta
+from rest_framework.settings import api_settings
+
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -13,7 +18,6 @@ SECRET_KEY = 'django-insecure-$kfl*)fa1%%l$@@al=(&0ye6b$gv^w105h=0ht-&pj942l=@*-
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS=['*']
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -25,6 +29,12 @@ CORS_ORIGIN_WHITELIST = (
 )
 
 # Application definition
+
+REST_KNOX = {
+
+  'TOKEN_TTL': timedelta(minutes=20),
+
+}
 
 INSTALLED_APPS = [
     'User',
@@ -60,6 +70,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+
 
 
 REST_FRAMEWORK = {
@@ -137,7 +150,7 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
