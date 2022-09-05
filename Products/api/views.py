@@ -1,11 +1,13 @@
+from itertools import product
 from rest_framework.response import Response
-from Products.models import Attr, Product, Category, Sold
+from Products.models import Attr, Product, Category, Sold , Seen
 from rest_framework.permissions import IsAuthenticated
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer 
 from rest_framework import generics
 from django.utils import timezone
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Max 
 
 
 class CreateProductListView(generics.CreateAPIView):
@@ -30,8 +32,6 @@ class CreateProductListView(generics.CreateAPIView):
 
 class SearchListView(generics.ListAPIView):
 
-    
-    print(timezone.now())
     queryset = Product.objects.all()
     permission_classes = (IsAuthenticated,)
     
@@ -45,3 +45,33 @@ class SearchListView(generics.ListAPIView):
         context["user_id"] = self.request.user.id
       
         return context
+
+
+
+
+
+# class MostSeenListView(generics.ListAPIView):
+
+
+#     seens = Seen.objects.order_by('seen').filter(seen=1)
+#     # queryset = Product.objects.filter(product_id__in = [i.prod_id_fk.pk for i in seens])
+    
+
+#     # seens  = [i for i in Seen.objects.values_list('prod_id_fk_id','seen').distinct()]
+    
+#     print(seens)
+    
+
+
+#     permission_classes = (IsAuthenticated,)
+#     serializer_class = ProductSerializer
+    
+#     def get_serializer_context(self):
+#         context = super().get_serializer_context()
+#         context["user_id"] = self.request.user.id
+      
+#         return context
+
+    
+
+    

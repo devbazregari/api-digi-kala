@@ -1,3 +1,4 @@
+from xml.dom import ValidationErr
 from rest_framework import serializers
 from Products.models import Product , Seen
 import datetime
@@ -9,12 +10,11 @@ from django.db.models import Max
 
 
 
-INCREASE_TIME = 2
+INCREASE_TIME = 0
 class ProductSerializer(serializers.ModelSerializer):
 
     seen = serializers.SerializerMethodField('get_product_seen')
     attrs = serializers.SerializerMethodField('get_product_attrs')
-    # user_id = serializers.SerializerMethodField('get_user_id')
 
     class Meta:
         model = Product
@@ -28,24 +28,43 @@ class ProductSerializer(serializers.ModelSerializer):
 
         prod_seen = Seen.objects.get_or_create(prod_id_fk=product , user_id_fk = user) # GET PRODUCT FOR EACH USER
         latest_seen_obj = Seen.objects.filter(prod_id_fk = product.pk).aggregate(Max('seen')) # GET LATEST SEEN
+        
+        
 
         permission_time = prod_seen[0].created_on
         time_now = datetime.now()
         ls = latest_seen_obj['seen__max']
-      
 
+
+        
         if permission_time < time_now:  # MAKING RESTRICTING TIME ( SEEING PRODUCT )
+            
+            try:
+                prev_seen_prod = Seen.objects.filter(prod_id_fk = product.pk).latest('seen')
+                print(prev_seen_prod.id)
+                print(prev_seen_prod.seen)
+                prev_seen_prod.last = 'False'
+                prev_seen_prod.save() 
+                print('hi')
+                 
+            except Seen.DoesNotExist as error:
+                print('error')
+                pass
 
+            
             if prod_seen[1] == True:
                 latest_seen = ls+1
                 prod_seen[0].seen = latest_seen
+                prod_seen[0].last = 'True'
 
             else:
                 prod_seen[0].seen = ls+1
+                prod_seen[0].last = 'True'
             
             time_seen = time_now +timedelta(minutes=INCREASE_TIME)
             prod_seen[0].created_on = time_seen
-            prod_seen[0].save()        
+            prod_seen[0].save()      
+            
 
             return prod_seen[0].seen
 
@@ -57,3 +76,6 @@ class ProductSerializer(serializers.ModelSerializer):
         attrs = obj.attrs.all()
 
         return attrs[0].name
+
+
+

@@ -42,7 +42,8 @@ class Seen(models.Model):
     seen            =   models.BigIntegerField(blank=True, null=True, default=0)
     user_id_fk      =   models.ForeignKey(to = User ,blank=False , null= False , on_delete=models.CASCADE)
     prod_id_fk      =   models.ForeignKey(to = Product ,blank=False , null= False , on_delete=models.CASCADE)
-    created_on =        models.DateTimeField(default = datetime.now())
+    last            =   models.CharField(default='True' , max_length=10)
+    created_on      =   models.DateTimeField(default = datetime.now())
 
 
 
