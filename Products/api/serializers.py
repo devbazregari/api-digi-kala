@@ -18,7 +18,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['title','brand','price','mainImage','brandCategory','intro','overView','seen','attrs']
+        fields = ['product_id','category_id_fk','title','brand','price','mainImage','brandCategory','intro','overView','seen','attrs']
 
 
     def get_product_seen(self,product):
@@ -41,17 +41,12 @@ class ProductSerializer(serializers.ModelSerializer):
             
             try:
                 prev_seen_prod = Seen.objects.filter(prod_id_fk = product.pk).latest('seen')
-                print(prev_seen_prod.id)
-                print(prev_seen_prod.seen)
                 prev_seen_prod.last = 'False'
                 prev_seen_prod.save() 
-                print('hi')
-                 
+              
             except Seen.DoesNotExist as error:
-                print('error')
-                pass
-
-            
+                prev_seen_prod = Seen.objects.filter(prod_id_fk = product.pk).latest('seen')
+                
             if prod_seen[1] == True:
                 latest_seen = ls+1
                 prod_seen[0].seen = latest_seen
@@ -73,7 +68,10 @@ class ProductSerializer(serializers.ModelSerializer):
     
 
     def get_product_attrs(self,obj):
+
+     
         attrs = obj.attrs.all()
+
 
         return attrs[0].name
 

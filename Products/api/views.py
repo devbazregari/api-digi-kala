@@ -17,15 +17,17 @@ class CreateProductListView(generics.CreateAPIView):
         
         attr          =     Attr(**request.data[1])
         category      =     request.data[0].pop('category')
-        sold_product  =     Sold(count = 1)
-        product       =     Product(**request.data[0]  , product_sold_id_fk = sold_product)
-        prod_category =     Category(name=category, product_id_fk=product)
 
-        sold_product.save()
+        category_obj  =     Category.objects.get_or_create(name=category)
+
+        product       =     Product(**request.data[0] , category_id_fk = category_obj[0])
+
+
+
     
         attr.save()
+     
         product.save()
-        prod_category.save()
         product.attrs.add(attr)
         return Response("product saved ")
 
@@ -36,10 +38,26 @@ class SearchListView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
     
     serializer_class = ProductSerializer
+    filter_backends = [SearchFilter, DjangoFilterBackend]
+    search_fields = ['intro', 'title','category']
+
+    def get_serializer_context(self , **kwargs):
+        context = super().get_serializer_context()
+        context["user_id"] = self.request.user.id
+      
+        return context
+
+
+class MostSeenListView(generics.ListAPIView):
+
+    seens = Seen.objects.order_by('seen').filter(last='True')[0:1]
+    queryset = Product.objects.filter(product_id__in = [i.prod_id_fk.pk for i in seens])
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ProductSerializer
 
     filter_backends = [SearchFilter, DjangoFilterBackend]
-    search_fields = ['intro', 'title']
-
+    search_fields = ['category_id_fk__name']
+    
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["user_id"] = self.request.user.id
@@ -48,30 +66,15 @@ class SearchListView(generics.ListAPIView):
 
 
 
+# class SellListView(generics.ListCreateAPIView):
+
+#     def post(self, request, *args, **kwargs):
+        
+        
+        
 
 
-# class MostSeenListView(generics.ListAPIView):
-
-
-#     seens = Seen.objects.order_by('seen').filter(seen=1)
-#     # queryset = Product.objects.filter(product_id__in = [i.prod_id_fk.pk for i in seens])
-    
-
-#     # seens  = [i for i in Seen.objects.values_list('prod_id_fk_id','seen').distinct()]
-    
-#     print(seens)
-    
-
-
-#     permission_classes = (IsAuthenticated,)
-#     serializer_class = ProductSerializer
-    
-#     def get_serializer_context(self):
-#         context = super().get_serializer_context()
-#         context["user_id"] = self.request.user.id
-      
-#         return context
-
+#         return Response('hi')
     
 
     
