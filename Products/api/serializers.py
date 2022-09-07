@@ -1,6 +1,6 @@
 from xml.dom import ValidationErr
 from rest_framework import serializers
-from Products.models import Product , Seen
+from Products.models import Product , Seen, Sold
 import datetime
 from User.models import User
 from datetime import datetime
@@ -11,14 +11,36 @@ from django.db.models import Max
 
 
 INCREASE_TIME = 0
+
 class ProductSerializer(serializers.ModelSerializer):
 
     seen = serializers.SerializerMethodField('get_product_seen')
     attrs = serializers.SerializerMethodField('get_product_attrs')
+    # expensive = serializers.SerializerMethodField('get_most_expensive_prod')
 
     class Meta:
         model = Product
         fields = ['product_id','category_id_fk','title','brand','price','mainImage','brandCategory','intro','overView','seen','attrs']
+
+
+
+
+    # def get_most_expensive_prod(self,product):
+        
+    #     if 'param' not in self.context:
+    #         return None
+        
+
+    #     result = Sold.objects.values_list('sold',flat=True).annotate(dcount=Count('sold')).order_by('-dcount')
+    
+    #     print(result)
+
+    #     return 's'
+
+
+
+
+
 
 
     def get_product_seen(self,product):
@@ -68,12 +90,10 @@ class ProductSerializer(serializers.ModelSerializer):
     
 
     def get_product_attrs(self,obj):
-
-     
         attrs = obj.attrs.all()
-
-
         return attrs[0].name
+
+
 
 
 
