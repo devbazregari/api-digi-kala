@@ -63,6 +63,7 @@ class Sold(models.Model):
     user_id_fk      =   models.ForeignKey(to = User ,blank=False , null= False , on_delete=models.CASCADE)
     prod_id_fk      =   models.ForeignKey(to = Product ,blank=False , null= False , on_delete=models.CASCADE)
     category_id_fk  =   models.ForeignKey(to = Category , on_delete=models.CASCADE)
+    discount        =   models.BooleanField(default=False , blank=True , null=True)
     created_on      =   models.DateTimeField(default = datetime.now())
 
 

@@ -7,8 +7,9 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter , OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-
+from django.db.models import Count , Q
 from rest_framework import mixins
+from datetime import datetime
 from rest_framework.pagination import PageNumberPagination
 
 class CreateProductListView(generics.CreateAPIView):
@@ -59,13 +60,39 @@ class SellProduct(APIView):
 
     def get(self , request , **kwargs):
 
-        print(kwargs['pk'])
+        DISCOUNT = False
         product_id  = Product.objects.get(pk=kwargs['pk'])
-        print(product_id)
         price       = kwargs['price']
         user_bought = request.user
 
-        sold_obj    = Sold(sold=price ,prod_id_fk = product_id , user_id_fk = user_bought , category_id_fk = product_id.category_id_fk)
+        today = datetime.today()
+        year  = datetime(today.year, today.month, 1)
+
+        year , month = str(datetime.today().year) , str(datetime.today().month)
+
+        time_now = year + "-" + "0"+month if len(month) == 1 else month
+
+
+        
+        discount = Sold.objects.filter(user_id_fk_id=user_bought.pk , created_on__startswith=time_now , discount=True)
+        
+        
+        
+        product_user_bought = Sold.objects.annotate(count=Count('user_id_fk_id')).filter(user_id_fk_id=user_bought.pk , created_on__startswith=time_now)
+
+        
+        print(product_user_bought)
+
+        print(discount)
+        print('discount')
+        
+        if not discount:
+            if len(product_user_bought) >= 2 :
+                price = int((price /100 ) * 30)
+                DISCOUNT = True
+
+        print(price)
+        sold_obj    = Sold(sold=price ,prod_id_fk = product_id , user_id_fk = user_bought , category_id_fk = product_id.category_id_fk , discount=DISCOUNT)
         sold_obj.save()
     
         return Response('product registered to products sold ')
