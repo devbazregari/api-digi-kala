@@ -32,7 +32,7 @@ CORS_ORIGIN_WHITELIST = (
 
 REST_KNOX = {
 
-  'TOKEN_TTL': timedelta(minutes=20),
+  'TOKEN_TTL': timedelta(minutes=60),
 
 }
 

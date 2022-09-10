@@ -50,8 +50,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
         prod_seen = Seen.objects.get_or_create(prod_id_fk=product , user_id_fk = user) # GET PRODUCT FOR EACH USER
         latest_seen_obj = Seen.objects.filter(prod_id_fk = product.pk).aggregate(Max('seen')) # GET LATEST SEEN
-        
-        
+
+
+        prod_seen[0].category_id_fk = product.category_id_fk
 
         permission_time = prod_seen[0].created_on
         time_now = datetime.now()
@@ -73,6 +74,7 @@ class ProductSerializer(serializers.ModelSerializer):
                 latest_seen = ls+1
                 prod_seen[0].seen = latest_seen
                 prod_seen[0].last = 'True'
+            
 
             else:
                 prod_seen[0].seen = ls+1
