@@ -13,14 +13,9 @@ class Attr(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=500, null=False, blank=False)
 
-
-
-
-
 class Product(models.Model):
     product_id      =   models.BigAutoField(null=False, blank=False, primary_key=True)
     attrs           =   models.ManyToManyField(to=Attr)
-    cart            =   models.ManyToManyField(to=User)
     category_id_fk  =   models.ForeignKey(to=Category , on_delete=models.CASCADE)
 
 
@@ -47,10 +42,12 @@ class Seen(models.Model):
 
         try:
             ctg  = Category.objects.get(name=kwargs['category'])
+            print('here')
         except Category.DoesNotExist:
+            print('wwww')
             ctg  = Category.objects.get(pk=1)
 
-        query = "select id , count(seen) , prod_id_fk_id  from Products_seen where category_id_fk_id = '{}' group by prod_id_fk_id order by count(seen)  limit 1 " .format(ctg.pk)
+        query = "select id , seen,sum(seen)  from Products_seen where category_id_fk_id = {} group by prod_id_fk_id order by sum(seen) desc limit 1" .format(ctg.pk)
         top_expensive_prod = Seen.objects.raw(query)
         queryset = Product.objects.filter(product_id__in = [i.prod_id_fk_id	 for i in top_expensive_prod])
     

@@ -10,43 +10,26 @@ from django.db.models import Max
 
 
 
-INCREASE_TIME = 0
 
+INCREASE_TIME = 0
 class ProductSerializer(serializers.ModelSerializer):
+
 
     seen = serializers.SerializerMethodField('get_product_seen')
     attrs = serializers.SerializerMethodField('get_product_attrs')
-    # expensive = serializers.SerializerMethodField('get_most_expensive_prod')
 
     class Meta:
         model = Product
         fields = ['product_id','category_id_fk','title','brand','price','mainImage','brandCategory','intro','overView','seen','attrs']
 
-
-
-
-    # def get_most_expensive_prod(self,product):
-        
-    #     if 'param' not in self.context:
-    #         return None
-        
-
-    #     result = Sold.objects.values_list('sold',flat=True).annotate(dcount=Count('sold')).order_by('-dcount')
-    
-    #     print(result)
-
-    #     return 's'
-
-
-
-
-
-
-
     def get_product_seen(self,product):
 
         prod_seen = None
+
         user  = User.objects.get(pk=self.context["user_id"])
+
+            
+       
 
         prod_seen = Seen.objects.get_or_create(prod_id_fk=product , user_id_fk = user) # GET PRODUCT FOR EACH USER
         latest_seen_obj = Seen.objects.filter(prod_id_fk = product.pk).aggregate(Max('seen')) # GET LATEST SEEN
@@ -58,8 +41,9 @@ class ProductSerializer(serializers.ModelSerializer):
         time_now = datetime.now()
         ls = latest_seen_obj['seen__max']
 
+        if 'flag' in self.context:
+            return ls
 
-        
         if permission_time < time_now:  # MAKING RESTRICTING TIME ( SEEING PRODUCT )
             
             try:
@@ -92,6 +76,9 @@ class ProductSerializer(serializers.ModelSerializer):
     
 
     def get_product_attrs(self,obj):
+
+       
+
         attrs = obj.attrs.all()
         return attrs[0].name
 
@@ -99,3 +86,24 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 
+
+class UserProductSerializer(ProductSerializer):
+
+
+    count = serializers.SerializerMethodField('get_product_count')
+
+    
+    def get_product_count(self,obj):
+
+        prod_count = self.context['count']
+
+        for i in prod_count:
+            count = i
+            prod_count.remove(i)
+            break
+            
+        return count
+
+
+    class Meta(ProductSerializer.Meta):
+        fields = ProductSerializer.Meta.fields + ['count',]
